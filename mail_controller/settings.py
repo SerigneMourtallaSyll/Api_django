@@ -94,6 +94,7 @@ PYTRACKING_CONFIGURATION = {
 #         'PORT': '5432',
 #     }
 # }
+
 DATABASES = {
     'default': dj_database_url.config(default='postgres://controller_mail_user:VPIO8iMYvZqhEvQOfIrEpnpbwTziqspW@dpg-cnoqq2vjbltc73fkefng-a.oregon-postgres.render.com/controller_mail')
 }
