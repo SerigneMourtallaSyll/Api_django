@@ -85,8 +85,12 @@ PYTRACKING_CONFIGURATION = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mail_controller',
+        'USER': 'controller_email',
+        'PASSWORD': 'controlleremail',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
