@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,16 +84,21 @@ PYTRACKING_CONFIGURATION = {
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'mail_controller',
+#         'USER': 'controller_email',
+#         'PASSWORD': 'controlleremail',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mail_controller',
-        'USER': 'controller_email',
-        'PASSWORD': 'controlleremail',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(default='postgres://controller_mail_user:VPIO8iMYvZqhEvQOfIrEpnpbwTziqspW@dpg-cnoqq2vjbltc73fkefng-a.oregon-postgres.render.com/controller_mail')
 }
+
+WSGI_APPLICATION = 'mail_controller.wsgi.application'
 
 
 # Password validation
