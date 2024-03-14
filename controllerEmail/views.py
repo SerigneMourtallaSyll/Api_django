@@ -14,6 +14,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from .models import EmailTracking
 import os
 import random
+from django.utils import timezone
+
 
 class SendTemplateMailView(APIView):
     def post(self, request, *args, **kwargs):
@@ -50,8 +52,8 @@ class tracking_pixel(APIView):
             try:
                 email_tracker = EmailTracker.objects.get(id=email_id)
                 email_tracking = EmailTracking.objects.create(email=email_tracker)
-                email_tracking.opened_at = datetime.now()
-                email_tracking.save()
+                email_tracker.opened_at = timezone.now()
+                email_tracker.save()
             except EmailTracker.DoesNotExist:
                 pass
 
