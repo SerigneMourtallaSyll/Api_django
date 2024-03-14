@@ -14,3 +14,10 @@ class EmailTracker(models.Model):
 class EmailTracking(models.Model):
     email = models.ForeignKey(EmailTracker, on_delete=models.CASCADE)
     opened_at = models.DateTimeField(auto_now_add=True, null=True)
+
+
+class EmailTest(models.Model):
+    # email = models.ForeignKey(EmailTracker, on_delete=models.CASCADE)
+    # opened_at = models.DateTimeField(auto_now_add=True, null=True)
+    open_at = models.CharField(max_length=255)
+

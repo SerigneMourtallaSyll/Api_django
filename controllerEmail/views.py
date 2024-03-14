@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import JsonResponse, HttpResponse
 from rest_framework import status
-from .models import EmailTracker, EmailTracking
+from .models import EmailTracker, EmailTracking, EmailTest
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponse
 from PIL import Image
@@ -11,7 +11,6 @@ from rest_framework.decorators import api_view
 from django.template.loader import get_template
 from django.urls import reverse
 from django.contrib.sites.shortcuts import get_current_site
-from .models import EmailTracking
 import os
 import random
 from django.utils import timezone
@@ -39,27 +38,40 @@ class SendTemplateMailView(APIView):
         return Response({"success": True})
 
 
+# class tracking_pixel(APIView):
+#     def get(self, request):
+#         # Créez une réponse HTTP vide avec un contenu d'un seul pixel transparent
+#         response = HttpResponse(content_type='image/gif')
+#         response['Content-Disposition'] = 'inline'
+#         response.write(b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x4c\x01\x00;')
+        
+#         # Enregistrez l'ouverture de l'e-mail dans la base de données
+#         email_id = request.GET.get('email_id')
+#         if email_id:
+#             try:
+#                 email_tracker = EmailTracker.objects.get(id=email_id)
+#                 email_tracking = EmailTracking.objects.create(email=email_tracker)
+#                 email_tracker.opened_at = timezone.now()
+#                 email_tracker.save()
+#             except EmailTracker.DoesNotExist:
+#                 pass
+
+#         return response
+
+
 class tracking_pixel(APIView):
     def get(self, request):
         # Créez une réponse HTTP vide avec un contenu d'un seul pixel transparent
-        response = HttpResponse(content_type='image/gif')
-        response['Content-Disposition'] = 'inline'
-        response.write(b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x4c\x01\x00;')
+        test_email = EmailTest()
+        test_email.open_at = timezone.now()
+        test_email.save()
+        return Response({"success": True})
         
-        # Enregistrez l'ouverture de l'e-mail dans la base de données
-        email_id = request.GET.get('email_id')
-        if email_id:
-            try:
-                email_tracker = EmailTracker.objects.get(id=email_id)
-                email_tracking = EmailTracking.objects.create(email=email_tracker)
-                email_tracker.opened_at = timezone.now()
-                print('Date d\'ouverture', timezone.now())
-                email_tracker.save()
-            except EmailTracker.DoesNotExist:
-                pass
 
-        return response
-
+class GetZone(APIView):
+    def get(self, request):
+        print("Date d'ouverture: ", type(timezone.now()))
+        return JsonResponse([], safe=False)
 
 class GetEmailTrackingData(APIView):
     def get(self, request):
