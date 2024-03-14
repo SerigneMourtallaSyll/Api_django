@@ -22,7 +22,7 @@ class SendTemplateMailView(APIView):
         context_data_is = dict()
         # Construire l'URL de l'image de suivi avec un paramètre de requête aléatoire
         random_param = f"random={random.randint(1, 100000)}"
-        image_url = request.build_absolute_uri(reverse("TrackingPixelView")) + '?' + random_param
+        image_url = request.build_absolute_uri(reverse("tracking_pixel")) + '?' + random_param
         context_data_is["image_url"] = image_url
         email_tracker = EmailTracker.objects.create(
             recipient_email=target_user_email,
@@ -67,7 +67,7 @@ class render_image(APIView):
             return response
 
 
-class TrackingPixelView(APIView):
+class tracking_pixel(APIView):
     def get(self, request):
         # Créez une réponse HTTP vide avec un contenu d'un seul pixel transparent
         response = HttpResponse(content_type='image/gif')

@@ -13,5 +13,5 @@ urlpatterns = [
     path('send/render_image/', render_image.as_view(), name='render_image'),
     path('send/', SendTemplateMailView.as_view(), name='send_template'),
     path('get_image/', GetEmailTrackingData.as_view(), name='get_template'),
-    path('tracking_pixel/', TrackingPixelView.as_view(), name='tracking_pixel'),
+    path('tracking/', TrackingPixelView.as_view(), name='tracking_pixel'),
 ]
