@@ -36,35 +36,35 @@ class SendTemplateMailView(APIView):
 
         return Response({"success": True})
 
-class render_image(APIView):
-    def get(self, request):
-        if request.method == 'GET':
-            current_directory = os.path.dirname(os.path.abspath(__file__))
-            image_path = os.path.join(current_directory, 'userAvatar.png')
+# class render_image(APIView):
+#     def get(self, request):
+#         if request.method == 'GET':
+#             current_directory = os.path.dirname(os.path.abspath(__file__))
+#             image_path = os.path.join(current_directory, 'userAvatar.png')
             
-            # Charger l'image à partir du système de fichiers
-            image = Image.open(image_path)
+#             # Charger l'image à partir du système de fichiers
+#             image = Image.open(image_path)
             
-            # Sauvegarder l'image dans une réponse HTTP
-            image_format = image.format if image.format else 'PNG'  # Utilisez le format d'origine si disponible, sinon PNG
-            response = HttpResponse(content_type=f"image/{image_format.lower()}")
-            image.save(response, image_format)
+#             # Sauvegarder l'image dans une réponse HTTP
+#             image_format = image.format if image.format else 'PNG'  # Utilisez le format d'origine si disponible, sinon PNG
+#             response = HttpResponse(content_type=f"image/{image_format.lower()}")
+#             image.save(response, image_format)
             
-            email_id = request.query_params.get('email_id')
-            if email_id:
-                try:
-                    email_tracker = EmailTracker.objects.get(id=email_id)
-                    email_tracking = EmailTracking.objects.create(email=email_tracker)
-                    email_tracking.opened_at = datetime.now()
-                    email_tracking.save()
-                except EmailTracker.DoesNotExist:
-                    pass
+#             email_id = request.query_params.get('email_id')
+#             if email_id:
+#                 try:
+#                     email_tracker = EmailTracker.objects.get(id=email_id)
+#                     email_tracking = EmailTracking.objects.create(email=email_tracker)
+#                     email_tracking.opened_at = datetime.now()
+#                     email_tracking.save()
+#                 except EmailTracker.DoesNotExist:
+#                     pass
             
-            # Ajouter un paramètre de requête aléatoire à l'URL de l'image
-            random_param = f"random={random.randint(1, 100000)}"
-            image_url = request.build_absolute_uri(reverse("render_image")) + '?' + random_param
+#             # Ajouter un paramètre de requête aléatoire à l'URL de l'image
+#             random_param = f"random={random.randint(1, 100000)}"
+#             image_url = request.build_absolute_uri(reverse("render_image")) + '?' + random_param
             
-            return response
+#             return response
 
 
 class tracking_pixel(APIView):

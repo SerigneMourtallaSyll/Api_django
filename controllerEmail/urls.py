@@ -7,10 +7,9 @@
 # ]
 
 from django.urls import path , include
-from .views import SendTemplateMailView , render_image, GetEmailTrackingData, tracking_pixel
+from .views import SendTemplateMailView , GetEmailTrackingData, tracking_pixel
 
 urlpatterns = [
-    path('send/render_image/', render_image.as_view(), name='render_image'),
     path('send/', SendTemplateMailView.as_view(), name='send_template'),
     path('get_image/', GetEmailTrackingData.as_view(), name='get_template'),
     path('tracking/', tracking_pixel.as_view(), name='tracking_pixel'),
