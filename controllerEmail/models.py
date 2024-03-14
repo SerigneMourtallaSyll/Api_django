@@ -10,14 +10,10 @@ class EmailTracker(models.Model):
     def get_last_opened_at(self):
         last_opening = self.emailtracking_set.aggregate(last_opened=Max('opened_at'))['last_opened']
         return last_opening
+        
 
 class EmailTracking(models.Model):
     email = models.ForeignKey(EmailTracker, on_delete=models.CASCADE)
     opened_at = models.DateTimeField(auto_now_add=True, null=True)
 
-
-class EmailTest(models.Model):
-    # email = models.ForeignKey(EmailTracker, on_delete=models.CASCADE)
-    # opened_at = models.DateTimeField(auto_now_add=True, null=True)
-    open_at = models.CharField(max_length=255)
 

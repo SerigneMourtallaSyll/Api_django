@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import JsonResponse, HttpResponse
 from rest_framework import status
-from .models import EmailTracker, EmailTracking, EmailTest
+from .models import EmailTracker, EmailTracking
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponse
 from PIL import Image
@@ -50,31 +50,9 @@ class tracking_pixel(APIView):
         email_tracker = EmailTracker.objects.last()
         email_tracker.opened_at = timezone.now()
         email_tracker.save()
-        # if email_id:
-        #     try:
-        #         email_tracker = EmailTracker.objects.get(id=email_id)
-        #         email_tracking = EmailTracking.objects.create(email=email_tracker)
-        #         email_tracker.opened_at = timezone.now()
-        #         email_tracker.save()
-        #     except EmailTracker.DoesNotExist:
-        #         pass
-
         return response
 
 
-# class tracking_pixel(APIView):
-#     def get(self, request):
-#         # Créez une réponse HTTP vide avec un contenu d'un seul pixel transparent
-#         test_email = EmailTest()
-#         test_email.open_at = timezone.now()
-#         test_email.save()
-#         return Response({"success": True})
-        
-
-class GetZone(APIView):
-    def get(self, request):
-        print("Date d'ouverture: ", type(timezone.now()))
-        return JsonResponse([], safe=False)
 
 class GetEmailTrackingData(APIView):
     def get(self, request):
