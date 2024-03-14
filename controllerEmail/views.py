@@ -53,6 +53,7 @@ class tracking_pixel(APIView):
                 email_tracker = EmailTracker.objects.get(id=email_id)
                 email_tracking = EmailTracking.objects.create(email=email_tracker)
                 email_tracker.opened_at = timezone.now()
+                print('Date d\'ouverture', timezone.now())
                 email_tracker.save()
             except EmailTracker.DoesNotExist:
                 pass
