@@ -36,6 +36,36 @@ class SendTemplateMailView(APIView):
 
         return Response({"success": True})
 
+
+class tracking_pixel(APIView):
+    def get(self, request):
+        # Créez une réponse HTTP vide avec un contenu d'un seul pixel transparent
+        response = HttpResponse(content_type='image/gif')
+        response['Content-Disposition'] = 'inline'
+        response.write(b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x4c\x01\x00;')
+        
+        # Enregistrez l'ouverture de l'e-mail dans la base de données
+        email_id = request.GET.get('email_id')
+        if email_id:
+            try:
+                email_tracker = EmailTracker.objects.get(id=email_id)
+                email_tracking = EmailTracking.objects.create(email=email_tracker)
+                email_tracking.opened_at = datetime.now()
+                email_tracking.save()
+            except EmailTracker.DoesNotExist:
+                pass
+
+        return response
+
+
+class GetEmailTrackingData(APIView):
+    def get(self, request):
+        email_id = request.GET.get('email_id')
+        email_tracking_data = EmailTracking.objects.filter(email__id=email_id)
+        data = [{'opened_at': track.opened_at} for track in email_tracking_data]
+        return JsonResponse(data, safe=False)
+
+
 # class render_image(APIView):
 #     def get(self, request):
 #         if request.method == 'GET':
@@ -65,32 +95,3 @@ class SendTemplateMailView(APIView):
 #             image_url = request.build_absolute_uri(reverse("render_image")) + '?' + random_param
             
 #             return response
-
-
-class tracking_pixel(APIView):
-    def get(self, request):
-        # Créez une réponse HTTP vide avec un contenu d'un seul pixel transparent
-        response = HttpResponse(content_type='image/gif')
-        response['Content-Disposition'] = 'inline'
-        response.write(b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x4c\x01\x00;')
-        
-        # Enregistrez l'ouverture de l'e-mail dans la base de données
-        email_id = request.GET.get('email_id')
-        if email_id:
-            try:
-                email_tracker = EmailTracker.objects.get(id=email_id)
-                email_tracking = EmailTracking.objects.create(email=email_tracker)
-                email_tracking.opened_at = datetime.now()
-                email_tracking.save()
-            except EmailTracker.DoesNotExist:
-                pass
-
-        return response
-
-
-class GetEmailTrackingData(APIView):
-    def get(self, request):
-        email_id = request.GET.get('email_id')
-        email_tracking_data = EmailTracking.objects.filter(email__id=email_id)
-        data = [{'opened_at': track.opened_at} for track in email_tracking_data]
-        return JsonResponse(data, safe=False)
