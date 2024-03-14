@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.contrib.sites.shortcuts import get_current_site
 from .models import EmailTracking
 import os
+import random
 
 class SendTemplateMailView(APIView):
     def post(self, request, *args, **kwargs):
@@ -58,6 +59,10 @@ class render_image(APIView):
                     email_tracking.save()
                 except EmailTracker.DoesNotExist:
                     pass
+            
+            # Ajouter un paramètre de requête aléatoire à l'URL de l'image
+            random_param = f"random={random.randint(1, 100000)}"
+            image_url = request.build_absolute_uri(reverse("render_image")) + '?' + random_param
             
             return response
 
