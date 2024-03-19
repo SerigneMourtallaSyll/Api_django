@@ -1,8 +1,7 @@
 from rest_framework import serializers
-from .models import *
+from .models import EmailTracker
 
-class GetDataSerializer(serializers.ModelSerializer):
-
+class EmailTrackerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserModel
-        fields = ['email','id']
+        model = EmailTracker
+        fields = ['id', 'recipient_email', 'subject', 'sent_at', 'opened_at']

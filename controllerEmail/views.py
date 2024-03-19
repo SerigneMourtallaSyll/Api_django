@@ -5,6 +5,8 @@ from django.http import JsonResponse, HttpResponse
 from rest_framework import status
 from .models import EmailTracker, EmailTracking
 from django.core.mail import EmailMultiAlternatives
+from rest_framework import generics
+from .serializer import EmailTrackerSerializer
 from django.http import HttpResponse
 from PIL import Image
 from rest_framework.decorators import api_view
@@ -21,7 +23,7 @@ class SendTemplateMailView(APIView):
         target_user_email = request.data.get('email')
         message = request.data.get('message')
         objet = request.data.get('objet')
-        
+
         mail_template = get_template("index.html") 
         context_data_is = dict()
         # Construire l'URL de l'image de suivi avec un paramètre de requête aléatoire
@@ -59,12 +61,12 @@ class tracking_pixel(APIView):
 
 
 
-class GetEmailTrackingData(APIView):
-    def get(self, request):
-        email_id = request.GET.get('email_id')
-        email_tracking_data = EmailTracking.objects.filter(email__id=email_id)
-        data = [{'opened_at': track.opened_at} for track in email_tracking_data]
-        return JsonResponse(data, safe=False)
+class GetEmailTrackingData(generics.ListAPIView):
+    def get_serializer_class(self):
+        return EmailTrackerSerializer
+
+    def get_queryset(self):
+        return EmailTracker.objects.all()
 
 
 # class render_image(APIView):
