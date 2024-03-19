@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'controllerEmail.apps.ControlleremailConfig',
     'ptrack',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'mail_controller.urls'
@@ -153,3 +155,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True 
 EMAIL_HOST_USER = 'serignemourtallasyll86@gmail.com' 
 EMAIL_HOST_PASSWORD = 'dhzw jpzx whna ltdo'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:3000",
+]
