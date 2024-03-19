@@ -20,7 +20,14 @@ from django.utils import timezone
 
 class SendTemplateMailView(APIView):
     def post(self, request, *args, **kwargs):
-        target_user_email = request.data.get('email')
+        target_user_emails = request.data.get('email')
+        if isinstance(target_user_emails, list):
+            target_user_emails = target_user_emails
+        elif isinstance(target_user_emails, str):
+            target_user_emails = [target_user_emails]
+        else:
+            return Response({"error": "Invalid email data format"}, status=status.HTTP_400_BAD_REQUEST)
+
         message = request.data.get('message')
         objet = request.data.get('objet')
 
@@ -32,15 +39,17 @@ class SendTemplateMailView(APIView):
         context_data_is["image_url"] = image_url
         context_data_is["message"] = message
         context_data_is["objet"] = objet
-        email_tracker = EmailTracker.objects.create(
-            recipient_email=target_user_email,
-            subject=objet,
-        )
-        html_detail = mail_template.render(context_data_is)
 
-        msg = EmailMultiAlternatives(objet, html_detail, 'serignemourtallasyll86@gmail.com', [target_user_email])
-        msg.content_subtype = 'html'
-        msg.send()
+        # Envoi d'e-mails à plusieurs destinataires
+        for email in target_user_emails:
+            email_tracker = EmailTracker.objects.create(
+                recipient_email=email,
+                subject=objet,
+            )
+            html_detail = mail_template.render(context_data_is)
+            msg = EmailMultiAlternatives(objet, html_detail, 'serignemourtallasyll86@gmail.com', [email])
+            msg.content_subtype = 'html'
+            msg.send()
 
         return Response({"success": True})
 
