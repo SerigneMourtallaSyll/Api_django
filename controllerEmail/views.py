@@ -19,19 +19,24 @@ from django.utils import timezone
 class SendTemplateMailView(APIView):
     def post(self, request, *args, **kwargs):
         target_user_email = request.data.get('email')
+        message = request.data.get('message')
+        objet = request.data.get('objet')
+        
         mail_template = get_template("index.html") 
         context_data_is = dict()
         # Construire l'URL de l'image de suivi avec un paramètre de requête aléatoire
         random_param = f"random={random.randint(1, 100000)}"
         image_url = request.build_absolute_uri(reverse("tracking_pixel")) + '?' + random_param
         context_data_is["image_url"] = image_url
+        context_data_is["message"] = message
+        context_data_is["objet"] = objet
         email_tracker = EmailTracker.objects.create(
             recipient_email=target_user_email,
-            subject="Lien de test",
+            subject=objet,
         )
         html_detail = mail_template.render(context_data_is)
 
-        msg = EmailMultiAlternatives("Greetings !!", html_detail, 'serignemourtallasyll86@gmail.com', [target_user_email])
+        msg = EmailMultiAlternatives(objet, html_detail, 'serignemourtallasyll86@gmail.com', [target_user_email])
         msg.content_subtype = 'html'
         msg.send()
 
