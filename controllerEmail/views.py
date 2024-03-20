@@ -15,6 +15,7 @@ from django.urls import reverse
 from django.contrib.sites.shortcuts import get_current_site
 import os
 import random
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 class SendTemplateMailView(APIView):
@@ -33,19 +34,21 @@ class SendTemplateMailView(APIView):
         mail_template = get_template("index.html") 
         context_data_is = dict()
 
-        email_id = EmailTracker.email_id
-
-        image_url = self.generate_tracking_pixel_url(request, email_id)
-        context_data_is["image_url"] = image_url
-        context_data_is["message"] = message
-        context_data_is["objet"] = objet
-
-        # Envoi d'e-mails à plusieurs destinataires
         for email in target_user_emails:
             email_tracker = EmailTracker.objects.create(
                 recipient_email=email,
                 subject=objet,
             )
+
+            # Obtenez l'email_id de l'instance d'EmailTracker actuelle
+            email_id = email_tracker.email_id
+
+            # Utilisez email_id pour générer l'URL du tracking pixel
+            image_url = self.generate_tracking_pixel_url(request, email_id)
+            context_data_is["image_url"] = image_url
+            context_data_is["message"] = message
+            context_data_is["objet"] = objet
+
             html_detail = mail_template.render(context_data_is)
             msg = EmailMultiAlternatives(objet, html_detail, 'serignemourtallasyll86@gmail.com', [email])
             msg.content_subtype = 'html'
@@ -60,17 +63,17 @@ class SendTemplateMailView(APIView):
         return tracking_pixel_url
 
 
-class tracking_pixel(APIView):
+class TrackingPixel(APIView):
     def get(self, request):
         email_id = request.GET.get('id')
         if email_id:
-            try:
-                email_tracker = EmailTracker.objects.get(email_id=email_id)
-                email_tracker.opened_at = timezone.now()
-                email_tracker.save()
-            except EmailTracker.DoesNotExist:
-                pass
-
+            # Recherchez l'instance d'EmailTracker correspondant à l'email_id
+            email_tracker = get_object_or_404(EmailTracker, email_id=email_id)
+            
+            # Mettez à jour le champ opened_at avec le timestamp actuel
+            email_tracker.opened_at = timezone.now()
+            email_tracker.save()
+        
         # Créez une réponse HTTP vide avec un contenu d'un seul pixel transparent
         response = HttpResponse(content_type='image/gif')
         response['Content-Disposition'] = 'inline'
