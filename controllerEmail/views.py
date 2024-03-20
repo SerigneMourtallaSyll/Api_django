@@ -62,7 +62,8 @@ class tracking_pixel(APIView):
         
         # Enregistrez l'ouverture de l'e-mail dans la base de données
         email_id = request.GET.get('email_id')
-        email_tracker = EmailTracker.objects.last()
+        recipient_email = request.GET.get('recipient_email')
+        email_tracker = EmailTracker.objects.filter(id=email_id, recipient_email=recipient_email).first()
         email_tracker.opened_at = timezone.now()
         email_tracker.save()
         return response
