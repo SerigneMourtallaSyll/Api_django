@@ -32,9 +32,8 @@ class SendTemplateMailView(APIView):
 
         mail_template = get_template("index.html") 
         context_data_is = dict()
-        # Construire l'URL de l'image de suivi avec un paramètre de requête aléatoire
-        random_param = f"random={random.randint(1, 100000)}"
-        image_url = request.build_absolute_uri(reverse("tracking_pixel")) + '?' + random_param
+        # Construire l'URL de l'image de suivi avec l'email_id
+        image_url = self.generate_tracking_pixel_url(request)
         context_data_is["image_url"] = image_url
         context_data_is["message"] = message
         context_data_is["objet"] = objet
@@ -52,21 +51,29 @@ class SendTemplateMailView(APIView):
 
         return Response({"success": True})
 
+    def generate_tracking_pixel_url(self, request):
+        email_id = request.GET.get('id')
+        tracking_pixel_url = request.build_absolute_uri(reverse("tracking_pixel"))
+        if email_id:
+            tracking_pixel_url += f"?id={email_id}"
+        return tracking_pixel_url
+
 
 class tracking_pixel(APIView):
     def get(self, request):
+        email_id = request.GET.get('id')
+        if email_id:
+            try:
+                email_tracker = EmailTracker.objects.get(email_id=email_id)
+                email_tracker.opened_at = timezone.now()
+                email_tracker.save()
+            except EmailTracker.DoesNotExist:
+                pass
+
         # Créez une réponse HTTP vide avec un contenu d'un seul pixel transparent
         response = HttpResponse(content_type='image/gif')
         response['Content-Disposition'] = 'inline'
         response.write(b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x4c\x01\x00;')
-        
-        # Enregistrez l'ouverture de l'e-mail dans la base de données
-        email_id = request.GET.get('id')
-        recipient_email = request.GET.get('recipient_email')
-        email_tracker = EmailTracker.objects.last()
-        email_tracker.opened_at = timezone.now()
-        email_tracker.save()
-        print(email_id)
         return response
 
 
