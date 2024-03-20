@@ -33,8 +33,8 @@ class SendTemplateMailView(APIView):
         mail_template = get_template("index.html") 
         context_data_is = dict()
 
-        email_id = email_tracker.email_id
-        
+        email_id = EmailTracker.email_id
+
         image_url = self.generate_tracking_pixel_url(request, email_id)
         context_data_is["image_url"] = image_url
         context_data_is["message"] = message
