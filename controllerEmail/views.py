@@ -38,21 +38,25 @@ class SendTemplateMailView(APIView):
         context_data_is["message"] = message
         context_data_is["objet"] = objet
 
-        # Envoi d'e-mails à plusieurs destinataires
         for email in target_user_emails:
             email_tracker = EmailTracker.objects.create(
                 recipient_email=email,
                 subject=objet,
             )
-            html_detail = mail_template.render(context_data_is)
-            msg = EmailMultiAlternatives(objet, html_detail, 'serignemourtallasyll86@gmail.com', [email])
-            msg.content_subtype = 'html'
-            msg.send()
+            # Obtenez l'email_id nouvellement créé
+            email_id = email_tracker.email_id
+
+            # Inclure email_id dans l'URL du tracking pixel
+            image_url = self.generate_tracking_pixel_url(request, email_id)
+            context_data_is["image_url"] = image_url
+            context_data_is["message"] = message
+            context_data_is["objet"] = objet
+
+            # Votre code existant pour l'envoi d'e-mails...
 
         return Response({"success": True})
 
-    def generate_tracking_pixel_url(self, request):
-        email_id = request.GET.get('id')
+    def generate_tracking_pixel_url(self, request, email_id):
         tracking_pixel_url = request.build_absolute_uri(reverse("tracking_pixel"))
         if email_id:
             tracking_pixel_url += f"?id={email_id}"
