@@ -55,22 +55,19 @@ class SendTemplateMailView(APIView):
 
 class tracking_pixel(APIView):
     def get(self, request):
-        email_id = request.GET.get('id')  # Obtenez l'ID de l'e-mail depuis la requête GET
-
-        # Recherchez l'e-mail dans la base de données
-        email_tracker = EmailTracker.objects.filter(id=email_id).last()
-
-        # Si l'e-mail est trouvé, enregistrez l'ouverture
-        if email_tracker:
-            email_tracker.opened_at = timezone.now()
-            email_tracker.save()
-
-        # Retournez une réponse vide avec un pixel transparent
+        # Créez une réponse HTTP vide avec un contenu d'un seul pixel transparent
         response = HttpResponse(content_type='image/gif')
         response['Content-Disposition'] = 'inline'
         response.write(b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x4c\x01\x00;')
+        
+        # Enregistrez l'ouverture de l'e-mail dans la base de données
+        email_id = request.GET.get('id')
+        recipient_email = request.GET.get('recipient_email')
+        email_tracker = EmailTracker.objects.last()
+        email_tracker.opened_at = timezone.now()
+        email_tracker.save()
+        print(email_id)
         return response
-
 
 
 class GetEmailTrackingData(generics.ListAPIView):
