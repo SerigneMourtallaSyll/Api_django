@@ -63,7 +63,7 @@ class SendTemplateMailView(APIView):
         return tracking_pixel_url
 
 
-class TrackingPixel(APIView):
+class tracking_pixel(APIView):
     def get(self, request):
         email_id = request.GET.get('id')
         if email_id:
