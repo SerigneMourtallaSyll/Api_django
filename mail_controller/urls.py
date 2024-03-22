@@ -19,6 +19,7 @@ from django.urls import path
 from django.urls.conf import include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
+from .settings import MEDIA_ROOT
 
 
 urlpatterns = [
@@ -26,4 +27,4 @@ urlpatterns = [
     path('', include('controllerEmail.urls'))
 ]
 
-urlpatterns+= static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns+= static(MEDIA_ROOT, document_root=MEDIA_ROOT)
