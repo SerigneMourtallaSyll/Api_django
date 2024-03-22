@@ -31,8 +31,6 @@ class SendTemplateMailView(APIView):
         message = request.data.get('message')
         objet = request.data.get('objet')
         document = request.FILES.get('document')
-        if not document:
-            return Response({"error": "No document attached"}, status=status.HTTP_400_BAD_REQUEST)
 
         mail_template = get_template("index.html") 
         context_data_is = dict()
