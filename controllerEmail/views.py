@@ -22,9 +22,9 @@ class SendTemplateMailView(APIView):
     def post(self, request, *args, **kwargs):
         target_user_emails = request.data.get('email')
         if isinstance(target_user_emails, list):
-            target_user_emails = target_user_emails
+            emails = target_user_emails
         elif isinstance(target_user_emails, str):
-            target_user_emails = [target_user_emails]
+            emails = [email.strip() for email in target_user_emails.split(',')]
         else:
             return Response({"error": "Invalid email data format"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -35,7 +35,7 @@ class SendTemplateMailView(APIView):
         mail_template = get_template("index.html") 
         context_data_is = dict()
 
-        for email in target_user_emails:
+        for email in emails:
             email_tracker = EmailTracker.objects.create(
                 recipient_email=email,
                 subject=objet,
@@ -58,6 +58,7 @@ class SendTemplateMailView(APIView):
             msg.send()
 
         return Response({"success": True})
+
 
     def generate_tracking_pixel_url(self, request, email_id):
         tracking_pixel_url = request.build_absolute_uri(reverse("tracking_pixel"))
