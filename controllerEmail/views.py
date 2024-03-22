@@ -30,7 +30,7 @@ class SendTemplateMailView(APIView):
 
         message = request.data.get('message')
         objet = request.data.get('objet')
-        document = request.FILES.get('document')
+        document = request.FILES.get('document', None)
 
         mail_template = get_template("index.html") 
         context_data_is = dict()
