@@ -32,7 +32,7 @@ class SendTemplateMailView(APIView):
         objet = request.data.get('objet')
         document = request.FILES.get('document', None)
 
-        mail_template = get_template("index.html") 
+        mail_template = get_template("index.html")
         context_data_is = dict()
 
         for email in emails:
@@ -54,10 +54,11 @@ class SendTemplateMailView(APIView):
             html_detail = mail_template.render(context_data_is)
             msg = EmailMultiAlternatives(objet, html_detail, 'serignemourtallasyll86@gmail.com', [email])
             msg.content_subtype = 'html'
-            msg.attach_file(email_tracker.document.path)
-            msg.send()
 
-        return Response({"success": True})
+            if document:
+                msg.attach_file(email_tracker.document.path)
+
+            msg.send()
 
 
     def generate_tracking_pixel_url(self, request, email_id):
