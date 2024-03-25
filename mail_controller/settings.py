@@ -159,4 +159,5 @@ EMAIL_HOST_PASSWORD = 'dhzw jpzx whna ltdo'
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
+    "https://mail-controller-frontend.vercel.app/",
 ]
