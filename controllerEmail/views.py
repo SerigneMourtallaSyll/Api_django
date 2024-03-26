@@ -50,6 +50,8 @@ class SendTemplateMailView(APIView):
             for image in images:
                 email_tracker.image.add(image)
 
+            email_tracker.save()
+
             # Obtenez l'email_id de l'instance d'EmailTracker actuelle
             email_id = email_tracker.email_id
 
