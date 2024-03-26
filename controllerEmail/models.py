@@ -5,6 +5,9 @@ import uuid
 def document_upload_path(instance, filename):
     return f'email_documents/{instance.email_id}/{filename}'
 
+def image_upload_path(instance, filename):
+    return f'email_images/{instance.email_id}/{filename}'
+
 class EmailTracker(models.Model):
     recipient_email = models.EmailField()
     subject = models.CharField(max_length=255)
@@ -12,6 +15,7 @@ class EmailTracker(models.Model):
     opened_at = models.DateTimeField(null=True, blank=True)
     email_id = models.UUIDField(default=uuid.uuid4, editable=False)
     document = models.FileField(upload_to=document_upload_path, blank=True, null=True)
+    image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
 
     def get_last_opened_at(self):
         last_opening = self.emailtracking_set.aggregate(last_opened=Max('opened_at'))['last_opened']

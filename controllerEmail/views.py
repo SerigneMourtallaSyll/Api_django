@@ -31,6 +31,7 @@ class SendTemplateMailView(APIView):
         message = request.data.get('message')
         objet = request.data.get('objet')
         document = request.FILES.get('document', None)
+        image = request.FILES.get('image', None)
 
         mail_template = get_template("index.html")
         context_data_is = dict()
@@ -56,6 +57,10 @@ class SendTemplateMailView(APIView):
             msg.content_subtype = 'html'
             if document:
                 msg.attach_file(email_tracker.document.path)
+
+            if image:
+                msg.attach_file(email_tracker.image.path)
+                
             msg.send()
 
         return Response({"success": True})
