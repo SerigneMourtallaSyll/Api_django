@@ -40,7 +40,8 @@ class SendTemplateMailView(APIView):
             email_tracker = EmailTracker.objects.create(
                 recipient_email=email,
                 subject=objet,
-                document=document
+                document=document,
+                image=image
             )
 
             # Obtenez l'email_id de l'instance d'EmailTracker actuelle
