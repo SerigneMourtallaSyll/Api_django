@@ -44,12 +44,12 @@ class SendTemplateMailView(APIView):
 
             # Attach documents to the email tracker
             for document in documents:
-                email_tracker.document.add(document)
+                email_tracker.document = document
                 email_tracker.save()
 
             # Attach images to the email tracker
             for image in images:
-                email_tracker.image.add(image)
+                email_tracker.image = image
                 email_tracker.save()
 
             # Obtenez l'email_id de l'instance d'EmailTracker actuelle
@@ -57,27 +57,19 @@ class SendTemplateMailView(APIView):
 
             # Utilisez email_id pour générer l'URL du tracking pixel
             image_url = self.generate_tracking_pixel_url(request, email_id)
+            context_data_is["image_url"] = image_url
+            context_data_is["message"] = message
+            context_data_is["objet"] = objet
 
-            # Générer le contenu du mail
-            context_data_is = {
-                "image_url": image_url,
-                "message": message,
-                "objet": objet,
-            }
             html_detail = mail_template.render(context_data_is)
-
-            # Créer l'email
-            msg = EmailMultiAlternatives(objet, html_detail, 'votre_email@gmail.com', [email])
+            msg = EmailMultiAlternatives(objet, html_detail, 'serignemourtallasyll86@gmail.com', [email])
             msg.content_subtype = 'html'
+            if email_tracker.document:
+                msg.attach_file(email_tracker.document.path)
 
-            # Attacher les documents et images
-            for document in email_tracker.document.all():
-                msg.attach_file(document.path)
-
-            for image in email_tracker.image.all():
-                msg.attach_file(image.path)
-
-            # Envoyer l'email
+            if email_tracker.image:
+                msg.attach_file(email_tracker.image.path)
+                
             msg.send()
 
         return Response({"success": True})
