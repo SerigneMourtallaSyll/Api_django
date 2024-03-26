@@ -44,13 +44,11 @@ class SendTemplateMailView(APIView):
 
             # Attach documents to the email tracker
             for document in documents:
-                email_tracker.document = document
-                email_tracker.save()
+                email_tracker.document.add(document)
 
             # Attach images to the email tracker
             for image in images:
-                email_tracker.image = image
-                email_tracker.save()
+                email_tracker.image.add(image)
 
             # Obtenez l'email_id de l'instance d'EmailTracker actuelle
             email_id = email_tracker.email_id
