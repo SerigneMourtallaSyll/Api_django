@@ -30,8 +30,8 @@ class SendTemplateMailView(APIView):
 
         message = request.data.get('message')
         objet = request.data.get('objet')
-        document = request.FILES.get('document', None)
-        image = request.FILES.get('image', None)
+        documents = request.FILES.getlist('document')
+        images = request.FILES.getlist('image')
 
         mail_template = get_template("index.html")
         context_data_is = dict()
@@ -40,9 +40,17 @@ class SendTemplateMailView(APIView):
             email_tracker = EmailTracker.objects.create(
                 recipient_email=email,
                 subject=objet,
-                document=document,
-                image=image
             )
+
+            # Attach documents to the email tracker
+            for document in documents:
+                email_tracker.document = document
+                email_tracker.save()
+
+            # Attach images to the email tracker
+            for image in images:
+                email_tracker.image = image
+                email_tracker.save()
 
             # Obtenez l'email_id de l'instance d'EmailTracker actuelle
             email_id = email_tracker.email_id
@@ -56,10 +64,10 @@ class SendTemplateMailView(APIView):
             html_detail = mail_template.render(context_data_is)
             msg = EmailMultiAlternatives(objet, html_detail, 'serignemourtallasyll86@gmail.com', [email])
             msg.content_subtype = 'html'
-            if document:
+            if email_tracker.document:
                 msg.attach_file(email_tracker.document.path)
 
-            if image:
+            if email_tracker.image:
                 msg.attach_file(email_tracker.image.path)
                 
             msg.send()
