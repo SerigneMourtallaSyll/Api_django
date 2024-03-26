@@ -37,42 +37,45 @@ class SendTemplateMailView(APIView):
         context_data_is = dict()
 
         for email in emails:
-            email_tracker = EmailTracker.objects.create(
-                recipient_email=email,
-                subject=objet,
-            )
-
-            # Attach documents to the email tracker
             for document in documents:
-                email_tracker.document = document
-                email_tracker.save()
+                email_tracker = EmailTracker.objects.create(
+                    recipient_email=email,
+                    subject=objet,
+                    document=document
+                )
 
-            # Attach images to the email tracker
-            for image in images:
-                email_tracker.image = image
-                email_tracker.save()
+                # Utilisez email_id pour générer l'URL du tracking pixel
+                email_id = email_tracker.email_id
+                image_url = self.generate_tracking_pixel_url(request, email_id)
+                context_data_is["image_url"] = image_url
+                context_data_is["message"] = message
+                context_data_is["objet"] = objet
 
-            email_tracker.save()
-
-            # Obtenez l'email_id de l'instance d'EmailTracker actuelle
-            email_id = email_tracker.email_id
-
-            # Utilisez email_id pour générer l'URL du tracking pixel
-            image_url = self.generate_tracking_pixel_url(request, email_id)
-            context_data_is["image_url"] = image_url
-            context_data_is["message"] = message
-            context_data_is["objet"] = objet
-
-            html_detail = mail_template.render(context_data_is)
-            msg = EmailMultiAlternatives(objet, html_detail, 'serignemourtallasyll86@gmail.com', [email])
-            msg.content_subtype = 'html'
-            if email_tracker.document:
+                html_detail = mail_template.render(context_data_is)
+                msg = EmailMultiAlternatives(objet, html_detail, 'serignemourtallasyll86@gmail.com', [email])
+                msg.content_subtype = 'html'
                 msg.attach_file(email_tracker.document.path)
+                msg.send()
 
-            if email_tracker.image:
+            for image in images:
+                email_tracker = EmailTracker.objects.create(
+                    recipient_email=email,
+                    subject=objet,
+                    image=image
+                )
+
+                # Utilisez email_id pour générer l'URL du tracking pixel
+                email_id = email_tracker.email_id
+                image_url = self.generate_tracking_pixel_url(request, email_id)
+                context_data_is["image_url"] = image_url
+                context_data_is["message"] = message
+                context_data_is["objet"] = objet
+
+                html_detail = mail_template.render(context_data_is)
+                msg = EmailMultiAlternatives(objet, html_detail, 'serignemourtallasyll86@gmail.com', [email])
+                msg.content_subtype = 'html'
                 msg.attach_file(email_tracker.image.path)
-                
-            msg.send()
+                msg.send()
 
         return Response({"success": True})
 
