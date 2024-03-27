@@ -114,5 +114,7 @@ class GetEmailTrackingData(generics.ListAPIView):
                 queryset = queryset.exclude(opened_at=None)
             else:
                 queryset = queryset.filter(opened_at=None)
+        if queryset.count() == 0:
+            return Response({"message": "Aucun e-mail non ouvert trouvé."}, status=status.HTTP_200_OK)
 
         return queryset
