@@ -104,15 +104,15 @@ class GetEmailTrackingData(generics.ListAPIView):
     def get_serializer_class(self):
         return EmailTrackerSerializer
 
-        def get_queryset(self):
-            is_opened = self.request.query_params.get('opened', None)
-            queryset = EmailTracker.objects.all()
-            
-            if is_opened is not None:
-                is_opened = bool(int(is_opened))
-                if is_opened:
-                    queryset = queryset.exclude(opened_at=None)
-                else:
-                    queryset = queryset.filter(opened_at=None)
+    def get_queryset(self):
+        is_opened = self.request.query_params.get('opened', None)
+        queryset = EmailTracker.objects.all()
+        
+        if is_opened is not None:
+            is_opened = bool(int(is_opened))
+            if is_opened:
+                queryset = queryset.exclude(opened_at=None)
+            else:
+                queryset = queryset.filter(opened_at=None)
 
-            return queryset
+        return queryset
