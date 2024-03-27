@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import JsonResponse, HttpResponse
 from rest_framework import status
-from .models import EmailTracker, EmailTracking
+from .models import EmailTracker, EmailTracking, Document, Images
 from django.core.mail import EmailMultiAlternatives
 from rest_framework import generics
 from .serializer import EmailTrackerSerializer
@@ -30,8 +30,8 @@ class SendTemplateMailView(APIView):
 
         message = request.data.get('message')
         objet = request.data.get('objet')
-        documents = request.FILES.getlist('document')
-        images = request.FILES.getlist('image')
+        documents = request.FILES.getlist('document', [])
+        images = request.FILES.getlist('image', [])
 
         mail_template = get_template("index.html")
         context_data_is = dict()
@@ -42,15 +42,14 @@ class SendTemplateMailView(APIView):
                 subject=objet,
             )
 
-            # Attach documents to the email tracker
-            for document in documents:
-                email_tracker.document = document
-                email_tracker.save()
+            for document_file in documents:
+                document_instance = Document.objects.create(file=document_file)
+                email_tracker.document.add(document_instance)
 
-            # Attach images to the email tracker
-            for image in images:
-                email_tracker.image = image
-                email_tracker.save()
+            # Ajout des images à l'instance d'EmailTracker
+            for image_file in images:
+                image_instance = Images.objects.create(file=image_file)
+                email_tracker.image.add(image_instance)
 
             # Obtenez l'email_id de l'instance d'EmailTracker actuelle
             email_id = email_tracker.email_id
@@ -62,13 +61,14 @@ class SendTemplateMailView(APIView):
             context_data_is["objet"] = objet
 
             html_detail = mail_template.render(context_data_is)
-            msg = EmailMultiAlternatives(objet, html_detail, 'serignemourtallasyll86@gmail.com', [email])
+            msg = EmailMultiAlternatives(objet, html_detail, 'CONTROLLERMAIL', [email])
             msg.content_subtype = 'html'
-            if email_tracker.document:
-                msg.attach_file(email_tracker.document.path)
+            for document_file in documents:
+                msg.attach(document_file.name, document_file.read())
 
-            if email_tracker.image:
-                msg.attach_file(email_tracker.image.path)
+            # Attachez les images à l'email si des images ont été téléchargées
+            for image_file in images:
+                msg.attach(image_file.name, image_file.read())
                 
             msg.send()
 
