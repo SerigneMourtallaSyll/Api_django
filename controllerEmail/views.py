@@ -120,8 +120,8 @@ class tracking_link(APIView):
             # Mettez à jour le champ opened_at avec le timestamp actuel
             email_tracker.opened_at_link = timezone.now()
             email_tracker.save()
-        # response = JsonResponse({"success": True})
-        return url
+        response = JsonResponse({"url": url})
+        return response
 
 
 
