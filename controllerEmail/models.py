@@ -15,6 +15,7 @@ class EmailTracker(models.Model):
     subject = models.CharField(max_length=255)
     sent_at = models.DateTimeField(auto_now_add=True)
     opened_at = models.DateTimeField(null=True, blank=True)
+    opened_at_link = models.DateTimeField(null=True, blank=True)
     email_id = models.UUIDField(default=uuid.uuid4, editable=False)
     document = models.ManyToManyField('Document', blank=True)
     image = models.ManyToManyField('Images', blank=True)
@@ -46,3 +47,4 @@ def delete_image_file(sender, instance, **kwargs):
 class EmailTracking(models.Model):
     email = models.ForeignKey(EmailTracker, on_delete=models.CASCADE)
     opened_at = models.DateTimeField(auto_now_add=True, null=True)
+    opened_at_link = models.DateTimeField(auto_now_add=True, null=True)

@@ -32,6 +32,7 @@ class SendTemplateMailView(APIView):
         objet = request.data.get('objet')
         documents = request.FILES.getlist('document', [])
         images = request.FILES.getlist('image', [])
+        link = request.data.get('link_url')
 
         mail_template = get_template("index.html")
         context_data_is = dict()
@@ -56,9 +57,11 @@ class SendTemplateMailView(APIView):
 
             # Utilisez email_id pour générer l'URL du tracking pixel
             image_url = self.generate_tracking_pixel_url(request, email_id)
+            linkUrl = self.generate_link_url(request, email_id, link)
             context_data_is["image_url"] = image_url
             context_data_is["message"] = message
             context_data_is["objet"] = objet
+            context_data_is["link"] = linkUrl
 
             html_detail = mail_template.render(context_data_is)
             msg = EmailMultiAlternatives(objet, html_detail, 'CONTROLLERMAIL', [email])
@@ -81,6 +84,12 @@ class SendTemplateMailView(APIView):
             tracking_pixel_url += f"?id={email_id}"
         return tracking_pixel_url
 
+    def generate_link_url(self, request, email_id, link):
+        tracking_link = request.build_absolute_uri(reverse("tracking_link"))
+        if email_id:
+            tracking_link += f"?id={email_id}&url={link}"
+        return tracking_link
+
 
 class tracking_pixel(APIView):
     def get(self, request):
@@ -98,6 +107,21 @@ class tracking_pixel(APIView):
         response['Content-Disposition'] = 'inline'
         response.write(b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x4c\x01\x00;')
         return response
+
+
+class tracking_link(APIView):
+    def get(self, request):
+        email_id = request.GET.get('id')
+        if email_id:
+            # Recherchez l'instance d'EmailTracker correspondant à l'email_id
+            email_tracker = get_object_or_404(EmailTracker, email_id=email_id)
+            
+            # Mettez à jour le champ opened_at avec le timestamp actuel
+            email_tracker.opened_at_link = timezone.now()
+            email_tracker.save()
+        response = Response({"success": True})
+        return response
+
 
 
 class GetEmailTrackingData(generics.ListAPIView):
