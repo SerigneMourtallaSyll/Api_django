@@ -112,6 +112,7 @@ class tracking_pixel(APIView):
 class tracking_link(APIView):
     def get(self, request):
         email_id = request.GET.get('id')
+        url = request.GET.get('url')
         if email_id:
             # Recherchez l'instance d'EmailTracker correspondant à l'email_id
             email_tracker = get_object_or_404(EmailTracker, email_id=email_id)
@@ -119,8 +120,8 @@ class tracking_link(APIView):
             # Mettez à jour le champ opened_at avec le timestamp actuel
             email_tracker.opened_at_link = timezone.now()
             email_tracker.save()
-        response = JsonResponse({"success": True})
-        return response
+        # response = JsonResponse({"success": True})
+        return url
 
 
 
