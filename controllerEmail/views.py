@@ -7,7 +7,7 @@ from .models import EmailTracker, EmailTracking, Document, Images
 from django.core.mail import EmailMultiAlternatives
 from rest_framework import generics
 from .serializer import EmailTrackerSerializer
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from PIL import Image
 from rest_framework.decorators import api_view
 from django.template.loader import get_template
@@ -120,8 +120,7 @@ class tracking_link(APIView):
             # Mettez à jour le champ opened_at avec le timestamp actuel
             email_tracker.opened_at_link = timezone.now()
             email_tracker.save()
-        response = JsonResponse({"url": url})
-        return response
+        return HttpResponseRedirect(url)
 
 
 
