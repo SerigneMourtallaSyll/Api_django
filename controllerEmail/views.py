@@ -116,3 +116,13 @@ class GetEmailTrackingData(generics.ListAPIView):
                 queryset = queryset.filter(opened_at=None)
 
         return queryset
+
+
+class EmailTrackerDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = EmailTracker.objects.all()
+    serializer_class = EmailTrackerSerializer
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({"success": True}, status=status.HTTP_204_NO_CONTENT)

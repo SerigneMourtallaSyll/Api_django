@@ -1,5 +1,7 @@
 from django.db import models
 from django.db.models import Max
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 import uuid
 
 def document_upload_path(instance, filename):
@@ -24,8 +26,22 @@ class EmailTracker(models.Model):
 class Document(models.Model):
     file = models.FileField(upload_to=document_upload_path)
 
+@receiver(pre_delete, sender=Document)
+def delete_document_file(sender, instance, **kwargs):
+    # Supprimer le fichier de document du stockage lors de la suppression de l'instance Document
+    if instance.file:
+        if default_storage.exists(instance.file.name):
+            default_storage.delete(instance.file.name)
+
 class Images(models.Model):
     file = models.ImageField(upload_to=image_upload_path)
+
+@receiver(pre_delete, sender=Images)
+def delete_image_file(sender, instance, **kwargs):
+    # Supprimer le fichier d'image du stockage lors de la suppression de l'instance Images
+    if instance.file:
+        if default_storage.exists(instance.file.name):
+            default_storage.delete(instance.file.name)
 
 class EmailTracking(models.Model):
     email = models.ForeignKey(EmailTracker, on_delete=models.CASCADE)
